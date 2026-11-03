@@ -8,8 +8,11 @@
       const addCompassButton = document.querySelector("#add-compass");
       const resetButton = document.querySelector("#reset");
       const rotateButton = document.querySelector("#rotate-left");
+      const themeToggleButton = document.querySelector("#theme-toggle");
+      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
       const initialState = { angle: 0, strength: 70, magnetX: 0.43, magnetY: 0.5 };
+      let theme = localStorage.getItem("magnet-compass-theme") === "dark" ? "dark" : "light";
       let angle = initialState.angle;
       let strength = initialState.strength;
       let magnet = { x: 0, y: 0 };
@@ -18,6 +21,15 @@
       let activeDrag = null;
       let width = 0;
       let height = 0;
+
+      function applyTheme() {
+        document.documentElement.dataset.theme = theme;
+        themeToggleButton.textContent = theme === "dark" ? "Use light theme" : "Use dark theme";
+        themeToggleButton.setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
+        themeToggleButton.setAttribute("aria-pressed", String(theme === "dark"));
+        themeColorMeta.content = theme === "dark" ? "#111827" : "#f3f6fb";
+        draw();
+      }
 
       const rotate = (point, radians) => ({
         x: point.x * Math.cos(radians) - point.y * Math.sin(radians),
@@ -123,16 +135,16 @@
         context.translate(compass.x, compass.y);
         context.beginPath();
         context.arc(0, 0, radius, 0, Math.PI * 2);
-        context.fillStyle = "#fff";
+        context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--compass-background").trim();
         context.shadowColor = "rgba(29, 49, 88, .16)";
         context.shadowBlur = 10;
         context.shadowOffsetY = 3;
         context.fill();
         context.shadowColor = "transparent";
-        context.strokeStyle = "#dbe2ed";
+        context.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--compass-border").trim();
         context.lineWidth = 1.5;
         context.stroke();
-        context.fillStyle = "#8490a4";
+        context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--subtle-text").trim();
         context.font = "700 7px system-ui, sans-serif";
         context.textAlign = "center";
         context.textBaseline = "middle";
@@ -160,7 +172,8 @@
       function draw() {
         if (!width || !height) return;
         context.clearRect(0, 0, width, height);
-        context.fillStyle = "#fbfcff";
+        const themeStyles = getComputedStyle(document.documentElement);
+        context.fillStyle = themeStyles.getPropertyValue("--canvas-background").trim();
         context.fillRect(0, 0, width, height);
 
         const spacing = width < 500 ? 53 : 61;
@@ -169,7 +182,7 @@
             const local = rotate({ x: x - magnet.x, y: y - magnet.y }, -angle * Math.PI / 180);
             if (Math.abs(local.x) < magnetSize.width / 2 + 12 && Math.abs(local.y) < magnetSize.height / 2 + 12) continue;
             const coveredByCompass = compasses.some((compass) => Math.hypot(x - compass.x, y - compass.y) < 30);
-            if (!coveredByCompass) drawArrow(x, y, fieldAt(x, y), "#c4cfe4", width < 500 ? 11 : 13);
+            if (!coveredByCompass) drawArrow(x, y, fieldAt(x, y), themeStyles.getPropertyValue("--field-color").trim(), width < 500 ? 11 : 13);
           }
         }
 
@@ -251,8 +264,14 @@
         compasses = [{ x: width * 0.77, y: height * 0.5 }];
         updateControls();
       });
+      themeToggleButton.addEventListener("click", () => {
+        theme = theme === "dark" ? "light" : "dark";
+        localStorage.setItem("magnet-compass-theme", theme);
+        applyTheme();
+      });
 
       new ResizeObserver(resize).observe(canvas);
+      applyTheme();
       resize();
       updateControls();
     })();
