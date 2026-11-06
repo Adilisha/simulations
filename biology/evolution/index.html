@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f3f6fb">
+  <title>Natural Selection Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="header-top">
+        <p class="eyebrow">Interactive biology</p>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark theme">Use dark theme</button>
+      </div>
+      <h1>Natural Selection Lab</h1>
+      <p class="intro">Watch a population of critters evolve. Each critter inherits a speed trait from its parent, and faster critters are more likely to escape the hawks. Over many generations, the population's average speed should shift.</p>
+    </header>
+
+    <section class="layout" aria-label="Natural selection simulation">
+      <div class="stage">
+        <div class="stage-heading">
+          <strong>Grassland view</strong>
+          <span class="hint">Critter color shows its speed — blue is slow, orange is fast</span>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="simulation" aria-label="Interactive view of critters, food pellets, and hawk predators"></canvas>
+          <div id="extinct-overlay" class="overlay" hidden>
+            <strong>Population extinct</strong>
+            <span>No critters remain. Adjust the controls and reset to try again.</span>
+          </div>
+        </div>
+        <div class="legend" aria-label="Legend">
+          <span><i class="key prey"></i>Critter (color = speed)</span>
+          <span><i class="key predator"></i>Hawk</span>
+          <span><i class="key food"></i>Food pellet</span>
+        </div>
+      </div>
+
+      <aside class="panel" aria-label="Simulation controls">
+        <h2>Experiment</h2>
+        <p class="panel-intro">Hawks hunt the slowest critters. Only the survivors reproduce, passing their traits — plus small random mutations — to their offspring.</p>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="hawk-speed">Hawk speed</label>
+            <output id="hawk-speed-value" for="hawk-speed">110 px/s</output>
+          </div>
+          <input id="hawk-speed" type="range" min="60" max="180" value="110">
+          <div class="range-ends"><span>Slow</span><span>Fast</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="hawk-count">Hawk count</label>
+            <output id="hawk-count-value" for="hawk-count">3</output>
+          </div>
+          <input id="hawk-count" type="range" min="0" max="8" value="3">
+          <div class="range-ends"><span>None</span><span>Many</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="mutation">Mutation rate</label>
+            <output id="mutation-value" for="mutation">25%</output>
+          </div>
+          <input id="mutation" type="range" min="0" max="100" value="25">
+          <div class="range-ends"><span>None</span><span>High</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="food">Food supply</label>
+            <output id="food-value" for="food">90 pellets</output>
+          </div>
+          <input id="food" type="range" min="20" max="200" value="90" step="10">
+          <div class="range-ends"><span>Scarce</span><span>Plentiful</span></div>
+        </div>
+
+        <div class="button-row">
+          <button id="pause" class="primary" type="button">Pause</button>
+          <button id="reset" type="button">Reset</button>
+        </div>
+
+        <div class="stats" aria-label="Population statistics">
+          <div class="stat"><span>Population</span><strong id="stat-pop">0</strong></div>
+          <div class="stat"><span>Mean speed</span><strong id="stat-speed">0%</strong></div>
+          <div class="stat"><span>Generation</span><strong id="stat-gen">0</strong></div>
+        </div>
+
+        <div class="chart-wrap">
+          <canvas id="chart" aria-label="Line chart of mean speed and population over time"></canvas>
+          <div class="chart-legend">
+            <span><i class="key line-speed"></i>Mean speed</span>
+            <span><i class="key line-pop"></i>Population</span>
+          </div>
+        </div>
+
+        <div class="tip"><strong>Try this:</strong> Set hawk speed near 120 px/s and watch the mean speed climb over a few minutes. Then set hawk count to 0 — without predators, speed stops mattering and the trait drifts randomly.</div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
