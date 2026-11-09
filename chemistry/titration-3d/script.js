@@ -16,6 +16,8 @@ const titrantMolarityOutput = document.querySelector("#titrant-molarity-value");
 const speedOutput = document.querySelector("#speed-value");
 const titrateButton = document.querySelector("#titrate");
 const resetButton = document.querySelector("#reset");
+const addDropButton = document.querySelector("#add-drop");
+const addMlButton = document.querySelector("#add-ml");
 const themeToggleButton = document.querySelector("#theme-toggle");
 const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 const statVolume = document.querySelector("#stat-volume");
@@ -157,7 +159,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(cssVar("--canvas-background"));
 
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-camera.position.set(3.1, 2.7, 4.3);
+camera.position.set(2.5, 2.3, 3.5);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 1.55, 0);
@@ -623,6 +625,16 @@ titrateButton.addEventListener("click", () => {
   updateControls();
 });
 resetButton.addEventListener("click", reset);
+
+function addTitrant(amount) {
+  if (finished) return;
+  running = false;
+  addedVolume = clamp(addedVolume + amount, 0, maxVolume);
+  if (addedVolume >= maxVolume) finished = true;
+  updateControls();
+}
+addDropButton.addEventListener("click", () => addTitrant(0.05));
+addMlButton.addEventListener("click", () => addTitrant(1));
 themeToggleButton.addEventListener("click", () => {
   theme = theme === "dark" ? "light" : "dark";
   localStorage.setItem("titration-theme", theme);
