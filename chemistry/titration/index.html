@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f3f6fb">
+  <title>Titration Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="header-top">
+        <p class="eyebrow">Interactive chemistry</p>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark theme">Use dark theme</button>
+      </div>
+      <h1>Titration Lab</h1>
+      <p class="intro">Titrate an acid or base with a standard solution and watch the pH change. The flask changes color with the indicator, and the curve shows exactly where the equivalence point falls.</p>
+    </header>
+
+    <section class="layout" aria-label="Titration simulation">
+      <div class="stage">
+        <div class="stage-heading">
+          <strong>Laboratory bench</strong>
+          <span class="hint">The flask color follows the indicator's transition range</span>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="simulation" aria-label="Interactive view of a burette dripping titrant into a flask"></canvas>
+        </div>
+        <div class="legend" aria-label="Legend">
+          <span><i class="key analyte"></i>Analyte in flask</span>
+          <span><i class="key titrant"></i>Titrant in burette</span>
+          <span><i class="key curve"></i>pH curve</span>
+        </div>
+      </div>
+
+      <aside class="panel" aria-label="Titration controls">
+        <h2>Experiment</h2>
+        <p class="panel-intro">Choose what is in the flask, then run the titration. The pH curve updates live as titrant is added.</p>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="analyte">Analyte in flask</label>
+          </div>
+          <select id="analyte">
+            <option value="strong-acid" selected>Strong acid (HCl)</option>
+            <option value="weak-acid">Weak acid (CH₃COOH)</option>
+            <option value="strong-base">Strong base (NaOH)</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="analyte-molarity">Analyte concentration</label>
+            <output id="analyte-molarity-value" for="analyte-molarity">0.10 M</output>
+          </div>
+          <input id="analyte-molarity" type="range" min="0.02" max="0.50" value="0.10" step="0.01">
+          <div class="range-ends"><span>0.02 M</span><span>0.50 M</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="analyte-volume">Analyte volume</label>
+            <output id="analyte-volume-value" for="analyte-volume">25.0 mL</output>
+          </div>
+          <input id="analyte-volume" type="range" min="10" max="50" value="25" step="1">
+          <div class="range-ends"><span>10 mL</span><span>50 mL</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="titrant-molarity">Titrant concentration</label>
+            <output id="titrant-molarity-value" for="titrant-molarity">0.10 M</output>
+          </div>
+          <input id="titrant-molarity" type="range" min="0.02" max="0.50" value="0.10" step="0.01">
+          <div class="range-ends"><span>0.02 M</span><span>0.50 M</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="indicator">Indicator</label>
+          </div>
+          <select id="indicator">
+            <option value="phenolphthalein" selected>Phenolphthalein</option>
+            <option value="methyl-orange">Methyl orange</option>
+            <option value="bromothymol-blue">Bromothymol blue</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="speed">Titration speed</label>
+            <output id="speed-value" for="speed">1.0 mL/s</output>
+          </div>
+          <input id="speed" type="range" min="0.2" max="4" value="1" step="0.1">
+          <div class="range-ends"><span>Slow</span><span>Fast</span></div>
+        </div>
+
+        <div class="button-row">
+          <button id="titrate" class="primary" type="button">Start titration</button>
+          <button id="reset" type="button">Reset</button>
+        </div>
+
+        <div class="stats" aria-label="Titration readings">
+          <div class="stat"><span>Titrant added</span><strong id="stat-volume">0.0 mL</strong></div>
+          <div class="stat"><span>pH</span><strong id="stat-ph">—</strong></div>
+          <div class="stat"><span>Equivalence</span><strong id="stat-equiv">—</strong></div>
+        </div>
+
+        <div class="status" id="status" aria-live="polite">Ready — press Start titration</div>
+
+        <div class="chart-wrap">
+          <canvas id="chart" aria-label="Line chart of pH versus titrant volume"></canvas>
+          <div class="chart-legend">
+            <span><i class="key line-ph"></i>pH curve</span>
+            <span><i class="key line-equiv"></i>Equivalence point</span>
+          </div>
+        </div>
+
+        <div class="tip"><strong>Try this:</strong> Titrate the weak acid with phenolphthalein — the curve has a buffered region before the endpoint. Switch to methyl orange to see why indicator choice matters for strong vs. weak acids.</div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
