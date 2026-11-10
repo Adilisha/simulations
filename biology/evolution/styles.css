@@ -71,7 +71,8 @@
     .header-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 
     .brand { display: flex; align-items: center; gap: 12px; }
-    .logo { display: block; height: 34px; width: auto; }
+    .logo { display: block; height: 34px; width: auto; filter: brightness(0); opacity: .82; }
+    :root[data-theme="dark"] .logo { filter: none; opacity: 1; }
 
     .eyebrow {
       margin: 0 0 8px;
