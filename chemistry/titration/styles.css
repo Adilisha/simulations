@@ -76,6 +76,9 @@
     header { margin: 0 0 22px; }
     .header-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo { display: block; height: 34px; width: auto; }
+
     .eyebrow {
       margin: 0 0 8px;
       color: var(--output-text);
