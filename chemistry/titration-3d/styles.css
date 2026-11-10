@@ -78,6 +78,9 @@
     header { margin: 0 0 10px; flex: 0 0 auto; }
     .header-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo { display: block; height: 30px; width: auto; }
+
     .eyebrow {
       margin: 0 0 8px;
       color: var(--output-text);
@@ -272,20 +275,20 @@
     .tip strong { color: var(--label-text); }
 
     @media (max-width: 760px) {
-      body { padding: 10px 10px; }
-      .app { height: auto; min-height: calc(100vh - 20px); }
+      body { padding: 23px 14px; }
       .layout { grid-template-columns: 1fr; }
-      .stage { min-height: 320px; }
-      .canvas-wrap, #viewport { min-height: 300px; height: 340px; }
-      #chart { min-height: 80px; height: 80px; }
+      .stage { min-height: 380px; }
+      .canvas-wrap, #viewport { min-height: 300px; }
+      #chart { min-height: 90px; height: 90px; }
       .panel {
+        max-height: none;
         overflow: visible;
         display: grid;
         grid-template-columns: 1fr 1fr;
         column-gap: 22px;
       }
-      .panel h2, .panel-intro, .button-row, .dropwise, .stats, .status, .chart-wrap, .tip { grid-column: 1 / -1; }
-      .panel-intro { margin-bottom: 12px; }
+      .panel h2, .panel-intro, .button-row, .stats, .status, .chart-wrap, .tip { grid-column: 1 / -1; }
+      .panel-intro { margin-bottom: 15px; }
     }
 
     @media (max-width: 480px) {
