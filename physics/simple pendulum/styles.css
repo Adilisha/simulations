@@ -45,14 +45,19 @@ body {
 header { margin-bottom: 22px; }
 .header-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 
-.brand { display: flex; align-items: center; gap: 12px; }
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
 .logo {
   display: block;
-  width: 34px;
   height: 34px;
+  width: auto;
   object-fit: contain;
-  filter: brightness(0) saturate(100%) invert(14%) sepia(40%) saturate(560%) hue-rotate(189deg) brightness(95%) contrast(100%);
-  opacity: 0.9;
+  filter: brightness(0);
+  opacity: 0.82;
 }
 
 .eyebrow {
@@ -65,7 +70,7 @@ header { margin-bottom: 22px; }
 }
 
 h1 {
-  margin: 0;
+  margin: 10px 0 0;
   font-size: clamp(1.8rem, 4vw, 2.5rem);
   letter-spacing: -0.045em;
 }
