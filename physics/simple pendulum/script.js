@@ -12,6 +12,8 @@ const toggleButton = document.getElementById("toggle");
 const resetButton = document.getElementById("reset");
 const themeToggleButton = document.getElementById("theme-toggle");
 const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+const dampingRate = 0.08;
+const restingAngle = toRadians(0.5);
 
 const state = {
   length: Number(lengthInput.value),
@@ -29,6 +31,12 @@ function toRadians(deg) {
   return (deg * Math.PI) / 180;
 }
 
+function getPendulumAngle(elapsed) {
+  const frequency = Math.sqrt(state.gravity / state.length);
+  const amplitude = state.amplitude * Math.exp(-dampingRate * elapsed);
+  return amplitude < restingAngle ? 0 : amplitude * Math.cos(frequency * elapsed);
+}
+
 function applyTheme() {
   document.documentElement.dataset.theme = theme;
   themeToggleButton.textContent = theme === "dark" ? "Use light theme" : "Use dark theme";
@@ -40,7 +48,7 @@ function applyTheme() {
 
 function updateOutputs() {
   const period = 2 * Math.PI * Math.sqrt(state.length / state.gravity);
-  const currentAngleDeg = Math.abs((state.amplitude * 180) / Math.PI);
+  const currentAngleDeg = Math.abs((getPendulumAngle(state.elapsed) * 180) / Math.PI);
 
   lengthValue.textContent = `${state.length.toFixed(1)} m`;
   amplitudeValue.textContent = `${state.amplitudeDeg.toFixed(0)}°`;
@@ -74,19 +82,75 @@ function draw() {
   const bobB = getComputedStyle(document.documentElement).getPropertyValue("--bob-color-2").trim();
   const angleColor = getComputedStyle(document.documentElement).getPropertyValue("--angle-color").trim();
   const labelColor = getComputedStyle(document.documentElement).getPropertyValue("--output-text").trim();
+  const mutedColor = getComputedStyle(document.documentElement).getPropertyValue("--subtle-text").trim();
 
   context.clearRect(0, 0, width, height);
   context.fillStyle = canvasBackground;
   context.fillRect(0, 0, width, height);
 
-  const pivotX = width / 2;
-  const pivotY = 44;
-  const scale = Math.min(width, height) * 0.33;
+  const standX = Math.max(48, width * 0.18);
+  const pivotY = 48;
+  const baseY = height - 46;
+  const poleTop = 34;
+  const bobRadius = 22;
+  const maxSwing = Math.sin(toRadians(60));
+  const scale = Math.min(
+    Math.min(width, height) * 0.52,
+    (width - standX - 2 * (bobRadius + 14)) / (2 * maxSwing)
+  );
   const bobLengthPx = scale * (state.length / 2.5);
+  const swingClearance = bobLengthPx * Math.sin(toRadians(state.amplitudeDeg)) + bobRadius + 14;
+  const pivotX = Math.min(
+    standX + Math.max(100, swingClearance),
+    width - swingClearance
+  );
 
-  const angle = state.running ? state.amplitude * Math.sin(Math.sqrt(state.gravity / state.length) * state.elapsed) : state.amplitude;
+  const angle = getPendulumAngle(state.elapsed);
   const bobX = pivotX + Math.sin(angle) * bobLengthPx;
   const bobY = pivotY + Math.cos(angle) * bobLengthPx;
+
+  const baseGradient = context.createLinearGradient(standX - 60, 0, standX + 60, 0);
+  baseGradient.addColorStop(0, "#71839d");
+  baseGradient.addColorStop(0.5, "#d5deeb");
+  baseGradient.addColorStop(1, "#71839d");
+  context.beginPath();
+  context.moveTo(standX - 56, baseY);
+  context.lineTo(standX - 46, baseY - 12);
+  context.lineTo(standX + 46, baseY - 12);
+  context.lineTo(standX + 56, baseY);
+  context.closePath();
+  context.fillStyle = baseGradient;
+  context.fill();
+  context.strokeStyle = stringColor;
+  context.lineWidth = 1;
+  context.stroke();
+
+  const rodGradient = context.createLinearGradient(standX - 5, 0, standX + 5, 0);
+  rodGradient.addColorStop(0, "#71839d");
+  rodGradient.addColorStop(0.45, "#f5f8fc");
+  rodGradient.addColorStop(1, "#71839d");
+  context.fillStyle = rodGradient;
+  context.fillRect(standX - 5, poleTop, 10, baseY - poleTop - 12);
+  context.strokeStyle = stringColor;
+  context.strokeRect(standX - 5, poleTop, 10, baseY - poleTop - 12);
+
+  const clampGradient = context.createLinearGradient(standX, pivotY - 15, standX, pivotY + 9);
+  clampGradient.addColorStop(0, "#526b8b");
+  clampGradient.addColorStop(0.5, "#b7c8de");
+  clampGradient.addColorStop(1, "#526b8b");
+  context.fillStyle = clampGradient;
+  context.fillRect(standX - 12, pivotY - 13, pivotX - standX + 18, 9);
+  context.fillStyle = "#647b98";
+  context.fillRect(standX - 12, pivotY - 18, 18, 19);
+  context.strokeStyle = stringColor;
+  context.strokeRect(standX - 12, pivotY - 18, 18, 19);
+
+  context.beginPath();
+  context.arc(pivotX, pivotY, 8, 0, Math.PI * 2);
+  context.fillStyle = "#d5deeb";
+  context.fill();
+  context.strokeStyle = stringColor;
+  context.stroke();
 
   context.strokeStyle = stringColor;
   context.lineWidth = 2.5;
@@ -95,12 +159,6 @@ function draw() {
   context.lineTo(bobX, bobY);
   context.stroke();
 
-  context.beginPath();
-  context.arc(pivotX, pivotY, 7, 0, Math.PI * 2);
-  context.fillStyle = stringColor;
-  context.fill();
-
-  const bobRadius = 22;
   const bobGradient = context.createRadialGradient(bobX - 8, bobY - 8, 5, bobX, bobY, bobRadius + 8);
   bobGradient.addColorStop(0, "#ffffff");
   bobGradient.addColorStop(0.2, bobA);
@@ -118,9 +176,14 @@ function draw() {
   context.strokeStyle = angleColor;
   context.lineWidth = 1.5;
   context.beginPath();
-  context.moveTo(pivotX, pivotY + 26);
-  context.lineTo(bobX, bobY);
+  context.arc(pivotX, pivotY, 32, Math.PI / 2, Math.PI / 2 + angle, angle < 0);
   context.stroke();
+
+  context.fillStyle = mutedColor;
+  context.font = "600 10px Inter, sans-serif";
+  context.textAlign = "left";
+  context.fillText("RETORT STAND", standX + 12, baseY - 24);
+  context.fillText("CLAMP", standX + 8, pivotY - 24);
 
   const labelY = height - 26;
   context.fillStyle = labelColor;

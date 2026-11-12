@@ -1,6 +1,8 @@
 # Simple pendulum
 
-This activity lets students explore how a pendulum moves and how the time period depends on its length and gravity.
+This activity lets students explore how a pendulum moves and how the time period depends on its length and gravity. Air resistance is modeled so the swings gradually become smaller and stop.
+
+The animation shows a retort stand with a clamp, string, and pendulum bob.
 
 ## Controls
 
