@@ -68,14 +68,19 @@
     .app { width: min(1120px, 100%); margin: 0 auto; }
 
     header { margin: 0 0 22px; }
-    .header-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 
-    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
     .logo { display: block; height: 34px; width: auto; filter: brightness(0); opacity: .82; }
     :root[data-theme="dark"] .logo { filter: none; opacity: 1; }
 
     .eyebrow {
-      margin: 0 0 8px;
+      margin: 0;
       color: var(--output-text);
       font-size: .73rem;
       font-weight: 750;
@@ -83,7 +88,7 @@
       text-transform: uppercase;
     }
 
-    h1 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.45rem); letter-spacing: -.045em; }
+    h1 { margin: 10px 0 0; font-size: clamp(1.7rem, 4vw, 2.45rem); letter-spacing: -.045em; }
     .intro { max-width: 650px; margin: 8px 0 0; color: var(--muted-text); line-height: 1.6; }
 
     .layout {
