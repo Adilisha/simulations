@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#eef4ff">
+  <title>Simple Pendulum Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="header-top">
+        <div class="brand">
+          <span class="logo" aria-hidden="true">∿</span>
+          <p class="eyebrow">Interactive physics</p>
+        </div>
+      </div>
+      <h1>Simple Pendulum Lab</h1>
+      <p class="intro">Change the string length, starting angle, and gravity to see how the pendulum swings and how its time period changes.</p>
+    </header>
+
+    <section class="layout" aria-label="Simple pendulum simulation">
+      <div class="stage">
+        <div class="stage-heading">
+          <strong>Pendulum motion</strong>
+          <span class="hint">Observe the oscillation</span>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="simulation" aria-label="Pendulum simulation"></canvas>
+        </div>
+        <div class="legend" aria-label="Simulation legend">
+          <span><i class="key bob"></i>Bob</span>
+          <span><i class="key string"></i>String</span>
+          <span><i class="key angle"></i>Angle</span>
+        </div>
+      </div>
+
+      <aside class="panel" aria-label="Pendulum controls">
+        <h2>Experiment</h2>
+        <p class="panel-intro">The time period depends on the length of the pendulum and the gravitational field.</p>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="length">String length</label>
+            <output id="length-value" for="length">1.2 m</output>
+          </div>
+          <input id="length" type="range" min="0.5" max="2.5" step="0.1" value="1.2">
+          <div class="range-ends"><span>0.5 m</span><span>2.5 m</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="amplitude">Start angle</label>
+            <output id="amplitude-value" for="amplitude">35°</output>
+          </div>
+          <input id="amplitude" type="range" min="10" max="60" step="1" value="35">
+          <div class="range-ends"><span>10°</span><span>60°</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="gravity">Gravity</label>
+            <output id="gravity-value" for="gravity">9.8 m/s²</output>
+          </div>
+          <input id="gravity" type="range" min="1.6" max="12" step="0.1" value="9.8">
+          <div class="range-ends"><span>1.6</span><span>12</span></div>
+        </div>
+
+        <div class="stats" aria-live="polite">
+          <div class="stat"><span>Period</span><strong id="period">2.20 s</strong></div>
+          <div class="stat"><span>Current angle</span><strong id="angle-readout">35°</strong></div>
+        </div>
+
+        <div class="button-row">
+          <button id="toggle" class="primary" type="button">Pause</button>
+          <button id="reset" type="button">Reset</button>
+        </div>
+
+        <div class="tip">
+          <strong>Try this:</strong> Increase the pendulum length and notice that the swing becomes slower. A shorter pendulum swings more quickly.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
