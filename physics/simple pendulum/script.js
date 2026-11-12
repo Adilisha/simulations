@@ -10,6 +10,8 @@ const periodValue = document.getElementById("period");
 const angleReadout = document.getElementById("angle-readout");
 const toggleButton = document.getElementById("toggle");
 const resetButton = document.getElementById("reset");
+const themeToggleButton = document.getElementById("theme-toggle");
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
 const state = {
   length: Number(lengthInput.value),
@@ -21,8 +23,19 @@ const state = {
   lastTimestamp: performance.now()
 };
 
+let theme = localStorage.getItem("pendulum-theme") === "dark" ? "dark" : "light";
+
 function toRadians(deg) {
   return (deg * Math.PI) / 180;
+}
+
+function applyTheme() {
+  document.documentElement.dataset.theme = theme;
+  themeToggleButton.textContent = theme === "dark" ? "Use light theme" : "Use dark theme";
+  themeToggleButton.setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
+  themeToggleButton.setAttribute("aria-pressed", String(theme === "dark"));
+  themeColorMeta.content = theme === "dark" ? "#111827" : "#eef4ff";
+  draw();
 }
 
 function updateOutputs() {
@@ -55,9 +68,15 @@ function resizeCanvas() {
 function draw() {
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
+  const canvasBackground = getComputedStyle(document.documentElement).getPropertyValue("--canvas-background").trim();
+  const stringColor = getComputedStyle(document.documentElement).getPropertyValue("--string-color").trim();
+  const bobA = getComputedStyle(document.documentElement).getPropertyValue("--bob-color-1").trim();
+  const bobB = getComputedStyle(document.documentElement).getPropertyValue("--bob-color-2").trim();
+  const angleColor = getComputedStyle(document.documentElement).getPropertyValue("--angle-color").trim();
+  const labelColor = getComputedStyle(document.documentElement).getPropertyValue("--output-text").trim();
 
   context.clearRect(0, 0, width, height);
-  context.fillStyle = "#f9fbff";
+  context.fillStyle = canvasBackground;
   context.fillRect(0, 0, width, height);
 
   const pivotX = width / 2;
@@ -69,7 +88,7 @@ function draw() {
   const bobX = pivotX + Math.sin(angle) * bobLengthPx;
   const bobY = pivotY + Math.cos(angle) * bobLengthPx;
 
-  context.strokeStyle = "#5c789d";
+  context.strokeStyle = stringColor;
   context.lineWidth = 2.5;
   context.beginPath();
   context.moveTo(pivotX, pivotY);
@@ -78,14 +97,15 @@ function draw() {
 
   context.beginPath();
   context.arc(pivotX, pivotY, 7, 0, Math.PI * 2);
-  context.fillStyle = "#516d98";
+  context.fillStyle = stringColor;
   context.fill();
 
   const bobRadius = 22;
   const bobGradient = context.createRadialGradient(bobX - 8, bobY - 8, 5, bobX, bobY, bobRadius + 8);
-  bobGradient.addColorStop(0, "#9bc3ff");
-  bobGradient.addColorStop(0.5, "#4175ff");
-  bobGradient.addColorStop(1, "#2d5ecf");
+  bobGradient.addColorStop(0, "#ffffff");
+  bobGradient.addColorStop(0.2, bobA);
+  bobGradient.addColorStop(0.7, bobB);
+  bobGradient.addColorStop(1, bobA);
 
   context.beginPath();
   context.arc(bobX, bobY, bobRadius, 0, Math.PI * 2);
@@ -95,7 +115,7 @@ function draw() {
   context.fill();
   context.shadowBlur = 0;
 
-  context.strokeStyle = "#d65a63";
+  context.strokeStyle = angleColor;
   context.lineWidth = 1.5;
   context.beginPath();
   context.moveTo(pivotX, pivotY + 26);
@@ -103,13 +123,13 @@ function draw() {
   context.stroke();
 
   const labelY = height - 26;
-  context.fillStyle = "#4967b1";
+  context.fillStyle = labelColor;
   context.font = "600 12px Inter, sans-serif";
   context.textAlign = "left";
-  context.fillText(`T = ${((2 * Math.PI * Math.sqrt(state.length / state.gravity))).toFixed(2)} s`, 18, labelY);
+  context.fillText(`T = ${(2 * Math.PI * Math.sqrt(state.length / state.gravity)).toFixed(2)} s`, 18, labelY);
 
   const angleText = `${Math.abs((angle * 180) / Math.PI).toFixed(0)}°`;
-  context.fillStyle = "#d65a63";
+  context.fillStyle = angleColor;
   context.fillText(`θ = ${angleText}`, width - 96, labelY);
 }
 
@@ -156,8 +176,15 @@ resetButton.addEventListener("click", () => {
   draw();
 });
 
+themeToggleButton.addEventListener("click", () => {
+  theme = theme === "dark" ? "light" : "dark";
+  localStorage.setItem("pendulum-theme", theme);
+  applyTheme();
+});
+
 window.addEventListener("resize", resizeCanvas);
 
+applyTheme();
 syncAmplitude();
 resizeCanvas();
 requestAnimationFrame(animate);
