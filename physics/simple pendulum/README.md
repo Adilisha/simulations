@@ -10,7 +10,9 @@ The animation shows a retort stand with a clamp, string, and pendulum bob.
 - Start angle: changes the initial displacement
 - Gravity: changes the gravitational field
 - Pause / Play: starts or stops the motion
-- Reset: returns the pendulum to its starting position
+- Stopwatch: shows elapsed time while the pendulum is moving
+- Complete swings: counts each full oscillation
+- Reset: returns the pendulum to its starting position and resets the stopwatch and count
 
 ## Concept
 

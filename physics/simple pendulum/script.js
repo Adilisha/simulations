@@ -8,6 +8,8 @@ const amplitudeValue = document.getElementById("amplitude-value");
 const gravityValue = document.getElementById("gravity-value");
 const periodValue = document.getElementById("period");
 const angleReadout = document.getElementById("angle-readout");
+const stopwatchValue = document.getElementById("stopwatch");
+const swingCountValue = document.getElementById("swing-count");
 const toggleButton = document.getElementById("toggle");
 const resetButton = document.getElementById("reset");
 const themeToggleButton = document.getElementById("theme-toggle");
@@ -37,6 +39,10 @@ function getPendulumAngle(elapsed) {
   return amplitude < restingAngle ? 0 : amplitude * Math.cos(frequency * elapsed);
 }
 
+function getSettlingTime() {
+  return Math.log(Math.max(state.amplitude, restingAngle) / restingAngle) / dampingRate;
+}
+
 function applyTheme() {
   document.documentElement.dataset.theme = theme;
   themeToggleButton.textContent = theme === "dark" ? "Use light theme" : "Use dark theme";
@@ -48,13 +54,15 @@ function applyTheme() {
 
 function updateOutputs() {
   const period = 2 * Math.PI * Math.sqrt(state.length / state.gravity);
-  const currentAngleDeg = Math.abs((getPendulumAngle(state.elapsed) * 180) / Math.PI);
+  const currentAngleDeg = (Math.abs(getPendulumAngle(state.elapsed)) * 180) / Math.PI;
 
   lengthValue.textContent = `${state.length.toFixed(1)} m`;
   amplitudeValue.textContent = `${state.amplitudeDeg.toFixed(0)}°`;
   gravityValue.textContent = `${state.gravity.toFixed(1)} m/s²`;
   periodValue.textContent = `${period.toFixed(2)} s`;
   angleReadout.textContent = `${currentAngleDeg.toFixed(0)}°`;
+  stopwatchValue.textContent = `${state.elapsed.toFixed(1)} s`;
+  swingCountValue.textContent = `${Math.floor(state.elapsed / period)}`;
 }
 
 function syncAmplitude() {
@@ -202,6 +210,11 @@ function animate(timestamp) {
 
   if (state.running) {
     state.elapsed += deltaSeconds;
+    if (state.elapsed >= getSettlingTime()) {
+      state.elapsed = getSettlingTime();
+      state.running = false;
+      toggleButton.textContent = "Play";
+    }
   }
 
   updateOutputs();
@@ -227,6 +240,9 @@ gravityInput.addEventListener("input", (event) => {
 });
 
 toggleButton.addEventListener("click", () => {
+  if (!state.running && state.elapsed >= getSettlingTime()) {
+    state.elapsed = 0;
+  }
   state.running = !state.running;
   toggleButton.textContent = state.running ? "Pause" : "Play";
   state.lastTimestamp = performance.now();
