@@ -135,6 +135,8 @@
       min-height: 430px;
       touch-action: none;
     }
+    #simulation { cursor: default; }
+    #simulation.over-tap { cursor: pointer; }
 
     #chart { height: 96px; min-height: 0; cursor: default; }
 

@@ -25,10 +25,10 @@
       <div class="stage">
         <div class="stage-heading">
           <strong>Laboratory bench</strong>
-          <span class="hint">The flask color follows the indicator's transition range</span>
+          <span class="hint">Click the burette tap to add a drop</span>
         </div>
         <div class="canvas-wrap">
-          <canvas id="simulation" aria-label="Interactive view of a burette dripping titrant into a flask"></canvas>
+          <canvas id="simulation" aria-label="Click the burette tap to dispense one drop of titrant into the flask"></canvas>
         </div>
         <div class="legend" aria-label="Legend">
           <span><i class="key analyte"></i>Analyte in flask</span>
@@ -39,7 +39,7 @@
 
       <aside class="panel" aria-label="Titration controls">
         <h2>Experiment</h2>
-        <p class="panel-intro">Choose what is in the flask, then run the titration. The pH curve updates live as titrant is added.</p>
+        <p class="panel-intro">Choose the solutions, then add drops one at a time or start the automatic flow. Pause whenever you like to inspect the pH and indicator.</p>
 
         <div class="control">
           <div class="control-heading">
@@ -101,6 +101,7 @@
 
         <div class="button-row">
           <button id="titrate" class="primary" type="button">Start titration</button>
+          <button id="add-drop" type="button" aria-label="Add one 0.05 milliliter drop">Add one drop · 0.05 mL</button>
           <button id="reset" type="button">Reset</button>
         </div>
 
@@ -110,7 +111,7 @@
           <div class="stat"><span>Equivalence</span><strong id="stat-equiv">—</strong></div>
         </div>
 
-        <div class="status" id="status" aria-live="polite">Ready — press Start titration</div>
+        <div class="status" id="status" aria-live="polite">Ready — add one drop or start the titration</div>
 
         <div class="chart-wrap">
           <canvas id="chart" aria-label="Line chart of pH versus titrant volume"></canvas>

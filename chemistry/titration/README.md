@@ -1,6 +1,6 @@
 # Titration Lab
 
-An interactive browser simulation of an acid–base titration. Run titrant from a burette into a flask of analyte, watch the indicator change color, and follow the pH curve to the equivalence point.
+An interactive browser simulation of an acid–base titration. Add titrant drop by drop from a graduated burette into an Erlenmeyer flask, watch the indicator change color, and follow the pH curve to the equivalence point.
 
 ## Run the simulation
 
@@ -18,19 +18,21 @@ Keep all three application files in the same folder:
 - **Analyte concentration / volume** — how much and how concentrated the flask contents are.
 - **Titrant concentration** — the standard solution in the burette.
 - **Indicator** — phenolphthalein, methyl orange, or bromothymol blue. The flask liquid changes color across the indicator's transition range.
-- **Titration speed** — how fast titrant is added.
-- **Start / Pause / Resume / Reset** — control the titration.
+- **Add one drop** — dispense 0.05 mL manually, either with the button or by clicking the burette tap. The pH, liquid level, indicator color, and chart update as each drop lands.
+- **Titration speed** — how fast the automatic flow adds titrant.
+- **Start / Pause / Resume / Reset** — control the automatic flow or clear the experiment.
 
 ## What to observe
 
 - The pH readout and the flask color both respond to the added titrant volume.
-- The chart shows the full theoretical pH curve (faint) with your progress traced in blue; the dashed red line marks the calculated equivalence point.
+- The burette tap releases drops into the flask, where each impact creates ripples and a brief, gentle flask shake.
+- The chart shows the full theoretical pH curve (faint) with your progress traced in blue as drops land; the dashed red line marks the calculated equivalence point.
 - The status line flags the endpoint region as you approach the equivalence point.
 - Weak acids show a buffered region and a less steep pH jump — try each indicator to see which transitions near the endpoint.
 
 ## Model notes
 
-This is a simplified educational model for monoprotic strong/weak acid–base systems at 25 °C (Kw = 10⁻¹⁴). pH is computed by solving the charge-balance equation numerically, so activity coefficients, dilution heat, and indicator error are ignored. The burette and flask are schematic, not to scale.
+This is a simplified educational model for monoprotic strong/weak acid–base systems at 25 °C (Kw = 10⁻¹⁴). pH is computed by solving the charge-balance equation numerically, so activity coefficients, dilution heat, and indicator error are ignored. The apparatus is drawn to resemble common laboratory glassware, but is schematic and not to scale.
 
 ## Technologies
 

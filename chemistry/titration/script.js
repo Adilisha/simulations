@@ -14,6 +14,7 @@
       const titrantMolarityOutput = document.querySelector("#titrant-molarity-value");
       const speedOutput = document.querySelector("#speed-value");
       const titrateButton = document.querySelector("#titrate");
+      const addDropButton = document.querySelector("#add-drop");
       const resetButton = document.querySelector("#reset");
       const themeToggleButton = document.querySelector("#theme-toggle");
       const themeColorMeta = document.querySelector('meta[name="theme-color"]');
@@ -24,6 +25,7 @@
 
       const KW = 1e-14;
       const ACETIC_KA = 1.8e-5;
+      const DROP_VOLUME = 0.05;
 
       let theme = localStorage.getItem("titration-theme") === "dark" ? "dark" : "light";
       let analyteType = "strong-acid";
@@ -41,7 +43,9 @@
       let maxVolume = 50;
       let equivalenceVolume = 25;
       let dripTimer = 0;
-      let bubbles = [];
+      let droplets = [];
+      let ripple = null;
+      let flaskShake = null;
       let lastTime = 0;
 
       const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -137,7 +141,8 @@
         chartCanvas.height = Math.round(chartBounds.height * pixelRatio);
         chartContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
-        bubbles = [];
+        droplets = [];
+        ripple = null;
         draw();
         drawChart();
       }
@@ -156,12 +161,14 @@
       function flaskPath(g) {
         context.beginPath();
         context.moveTo(g.cx - g.neckHalf, g.neckTop);
-        context.lineTo(g.cx - g.neckHalf, g.topY);
-        context.lineTo(g.cx - g.topHalf, g.topY);
-        context.lineTo(g.cx - g.bottomHalf, g.bottomY);
-        context.lineTo(g.cx + g.bottomHalf, g.bottomY);
-        context.lineTo(g.cx + g.topHalf, g.topY);
-        context.lineTo(g.cx + g.neckHalf, g.topY);
+        context.lineTo(g.cx - g.neckHalf, g.topY - 5);
+        context.quadraticCurveTo(g.cx - g.topHalf, g.topY - 2, g.cx - g.topHalf - 5, g.topY + 25);
+        context.lineTo(g.cx - g.bottomHalf + 8, g.bottomY - 20);
+        context.quadraticCurveTo(g.cx - g.bottomHalf, g.bottomY, g.cx - g.bottomHalf + 20, g.bottomY);
+        context.lineTo(g.cx + g.bottomHalf - 20, g.bottomY);
+        context.quadraticCurveTo(g.cx + g.bottomHalf, g.bottomY, g.cx + g.bottomHalf - 8, g.bottomY - 20);
+        context.lineTo(g.cx + g.topHalf + 5, g.topY + 25);
+        context.quadraticCurveTo(g.cx + g.topHalf, g.topY - 2, g.cx + g.neckHalf, g.topY - 5);
         context.lineTo(g.cx + g.neckHalf, g.neckTop);
         context.closePath();
       }
@@ -178,9 +185,19 @@
         flaskPath(g);
         context.clip();
         context.fillStyle = fillColor;
-        context.fillRect(g.cx - g.bottomHalf - 4, surfaceY, (g.bottomHalf + 4) * 2, g.bottomY - surfaceY + 4);
-        context.fillStyle = "rgba(255,255,255,.25)";
-        context.fillRect(g.cx - g.bottomHalf - 4, surfaceY, (g.bottomHalf + 4) * 2, 3);
+        context.beginPath();
+        context.moveTo(g.cx - g.bottomHalf - 4, surfaceY - 2);
+        context.quadraticCurveTo(g.cx, surfaceY + 3, g.cx + g.bottomHalf + 4, surfaceY - 2);
+        context.lineTo(g.cx + g.bottomHalf + 4, g.bottomY + 4);
+        context.lineTo(g.cx - g.bottomHalf - 4, g.bottomY + 4);
+        context.closePath();
+        context.fill();
+        context.strokeStyle = "rgba(255,255,255,.62)";
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(g.cx - g.topHalf + 8, surfaceY - 1);
+        context.quadraticCurveTo(g.cx, surfaceY + 4, g.cx + g.topHalf - 8, surfaceY - 1);
+        context.stroke();
         context.restore();
       }
 
@@ -188,26 +205,36 @@
         const themeStyles = getComputedStyle(document.documentElement);
         const rodColor = themeStyles.getPropertyValue("--subtle-text").trim();
         const g = flaskGeometry();
-        const rodX = g.cx + g.bottomHalf + 46;
+        const rodX = Math.max(26, g.cx - Math.min(155, width * 0.28));
         const baseY = height * 0.9;
+        const clampY = height * 0.2;
         context.strokeStyle = rodColor;
         context.fillStyle = rodColor;
-        context.lineWidth = 5;
+        context.lineWidth = 6;
+        context.lineCap = "round";
         context.beginPath();
-        context.moveTo(rodX, height * 0.12);
+        context.moveTo(rodX, height * 0.09);
         context.lineTo(rodX, baseY);
         context.stroke();
-        context.lineWidth = 3;
+        context.lineWidth = 5;
         context.beginPath();
-        context.moveTo(rodX - 34, baseY);
-        context.lineTo(rodX + 8, baseY);
+        context.moveTo(rodX - 38, baseY);
+        context.lineTo(rodX + 38, baseY);
+        context.stroke();
+        context.lineWidth = 4;
+        context.beginPath();
+        context.moveTo(rodX, clampY);
+        context.lineTo(g.cx - 18, clampY);
         context.stroke();
         context.beginPath();
-        context.arc(rodX - 20, g.topY + 40, 5, 0, Math.PI * 2);
+        context.arc(rodX, clampY, 8, 0, Math.PI * 2);
         context.fill();
         context.beginPath();
-        context.moveTo(rodX - 20, g.topY + 40);
-        context.lineTo(g.cx + g.topHalf + 8, g.topY + 40);
+        context.moveTo(g.cx - 18, clampY - 7);
+        context.lineTo(g.cx - 18, clampY + 7);
+        context.lineTo(g.cx - 8, clampY + 7);
+        context.moveTo(g.cx - 18, clampY - 7);
+        context.lineTo(g.cx - 8, clampY - 7);
         context.stroke();
       }
 
@@ -226,32 +253,52 @@
 
         context.save();
         context.beginPath();
-        context.roundRect(bx - bw / 2, topY, bw, bh, 8);
+        context.roundRect(bx - bw / 2, topY, bw, bh, 7);
         context.fillStyle = glassColor;
         context.fill();
         context.strokeStyle = glassBorder;
-        context.lineWidth = 1.5;
+        context.lineWidth = 2;
         context.stroke();
 
         context.save();
         context.beginPath();
         context.roundRect(bx - bw / 2 + 3, topY + 4, bw - 6, bh - 8, 6);
         context.clip();
-        context.fillStyle = "rgba(91, 141, 217, .55)";
+        context.fillStyle = "rgba(91, 141, 217, .58)";
         context.fillRect(bx - bw / 2 + 3, liquidTop, bw - 6, bottomY - liquidTop);
+        context.fillStyle = "rgba(255,255,255,.55)";
+        context.fillRect(bx - bw / 2 + 5, Math.max(topY + 5, liquidTop - 2), bw - 10, 2);
         context.restore();
 
+        context.strokeStyle = themeStyles.getPropertyValue("--subtle-text").trim();
         context.fillStyle = themeStyles.getPropertyValue("--muted-text").trim();
-        context.font = "600 10px system-ui, sans-serif";
-        context.textAlign = "center";
-        for (let i = 1; i <= 5; i++) {
-          const y = topY + (bh / 6) * i;
-          context.fillRect(bx + bw / 2 - 8, y, 6, 1);
-          context.fillText(`${50 - i * 10}`, bx + bw / 2 + 14, y + 3);
+        context.lineWidth = 1;
+        context.font = "600 9px system-ui, sans-serif";
+        context.textAlign = "left";
+        context.textBaseline = "middle";
+        for (let i = 0; i <= 50; i++) {
+          const y = topY + (bh * i) / 50;
+          const major = i % 10 === 0;
+          const medium = i % 5 === 0;
+          const tickLength = major ? 10 : medium ? 7 : 4;
+          context.beginPath();
+          context.moveTo(bx + bw / 2 - tickLength, y);
+          context.lineTo(bx + bw / 2 - 2, y);
+          context.stroke();
+          if (major) context.fillText(`${(maxVolume * i / 50).toFixed(0)}`, bx + bw / 2 + 8, y);
         }
 
+        const tapY = bottomY + 5;
         context.fillStyle = glassBorder;
-        context.fillRect(bx - 5, bottomY, 10, 12);
+        context.fillRect(bx - 5, bottomY - 1, 10, 12);
+        context.fillStyle = themeStyles.getPropertyValue("--label-text").trim();
+        context.beginPath();
+        context.roundRect(bx - 16, tapY - 3, 32, 6, 3);
+        context.fill();
+        context.fillStyle = "#5478e8";
+        context.beginPath();
+        context.arc(bx + 16, tapY, 3, 0, Math.PI * 2);
+        context.fill();
         context.beginPath();
         context.moveTo(bx - 2.5, bottomY + 12);
         context.lineTo(bx + 2.5, bottomY + 12);
@@ -261,14 +308,46 @@
         context.restore();
       }
 
+      function pendingVolume() {
+        return droplets.reduce((total, drop) => total + drop.volume, 0);
+      }
+
+      function createDrop() {
+        const volume = Math.min(DROP_VOLUME, maxVolume - addedVolume - pendingVolume());
+        if (volume <= 1e-9) return false;
+        const g = flaskGeometry();
+        droplets.push({ x: g.cx, y: g.neckTop + 18, vy: 24, r: 3.2, volume });
+        return true;
+      }
+
       function drawDrip(dt) {
-        if (!running || finished) return;
-        dripTimer -= dt;
-        if (dripTimer <= 0) {
-          dripTimer = 0.45;
-          const g = flaskGeometry();
-          bubbles.push({ x: g.cx + rand(-14, 14), y: liquidSurfaceY(g, currentFraction()) + 6, r: rand(1.5, 3), vy: rand(14, 26) });
-          if (bubbles.length > 80) bubbles.shift();
+        if (running && !finished) {
+          dripTimer -= dt;
+          if (dripTimer <= 0) {
+            if (createDrop()) dripTimer += DROP_VOLUME / titrationSpeed;
+            else running = false;
+          }
+        }
+        const g = flaskGeometry();
+        const surfaceY = liquidSurfaceY(g, currentFraction());
+        for (let i = droplets.length - 1; i >= 0; i--) {
+          const drop = droplets[i];
+          drop.vy += 900 * dt;
+          drop.y += drop.vy * dt;
+          if (drop.y >= surfaceY) {
+            addedVolume = Math.min(maxVolume, addedVolume + drop.volume);
+            ripple = { y: surfaceY, age: 0 };
+            flaskShake = { age: 0, direction: Math.random() < 0.5 ? -1 : 1 };
+            droplets.splice(i, 1);
+          }
+        }
+        if (ripple) {
+          ripple.age += dt;
+          if (ripple.age > 0.45) ripple = null;
+        }
+        if (flaskShake) {
+          flaskShake.age += dt;
+          if (flaskShake.age > 0.4) flaskShake = null;
         }
       }
 
@@ -284,11 +363,17 @@
       function drawFlask(ph) {
         const g = flaskGeometry();
         const themeStyles = getComputedStyle(document.documentElement);
-        const glassColor = themeStyles.getPropertyValue("--glass").trim();
         const glassBorder = themeStyles.getPropertyValue("--glass-border").trim();
         const fill = indicatorRGB(ph);
         const fraction = currentFraction();
+        const shakeAngle = flaskShake
+          ? flaskShake.direction * 0.026 * Math.exp(-9 * flaskShake.age) * Math.cos(flaskShake.age * Math.PI * 2 * 10)
+          : 0;
 
+        context.save();
+        context.translate(g.cx, g.bottomY);
+        context.rotate(shakeAngle);
+        context.translate(-g.cx, -g.bottomY);
         clipFlaskLiquid(g, fill, fraction);
 
         context.save();
@@ -297,6 +382,19 @@
         context.fill();
         context.strokeStyle = glassBorder;
         context.lineWidth = 2;
+        context.stroke();
+        context.restore();
+
+        context.save();
+        context.strokeStyle = "rgba(255,255,255,.68)";
+        context.lineWidth = 3;
+        context.beginPath();
+        context.moveTo(g.cx - g.neckHalf + 5, g.neckTop + 8);
+        context.lineTo(g.cx - g.neckHalf + 5, g.topY - 12);
+        context.quadraticCurveTo(g.cx - g.topHalf - 2, g.topY + 8, g.cx - g.bottomHalf + 15, g.bottomY - 23);
+        context.stroke();
+        context.beginPath();
+        context.ellipse(g.cx, g.neckTop, g.neckHalf, 4, 0, 0, Math.PI * 2);
         context.stroke();
         context.restore();
 
@@ -310,19 +408,48 @@
         context.moveTo(g.cx - g.topHalf + 10, surfaceY);
         context.lineTo(g.cx + g.topHalf - 10, surfaceY);
         context.stroke();
-        context.restore();
-
-        if (running && !finished) {
-          for (const b of bubbles) {
-            b.y -= b.vy / 60;
-            b.x += Math.sin(b.y * 0.15) * 0.3;
-            if (b.y < surfaceY + 4) b.y = surfaceY + rand(4, 20);
-            context.beginPath();
-            context.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-            context.fillStyle = "rgba(255,255,255,.4)";
-            context.fill();
-          }
+        if (ripple) {
+          const progress = ripple.age / 0.45;
+          context.beginPath();
+          context.ellipse(g.cx, ripple.y, 5 + progress * 19, 2 + progress * 5, 0, 0, Math.PI * 2);
+          context.strokeStyle = `rgba(255,255,255,${(1 - progress) * 0.55})`;
+          context.lineWidth = 1.5;
+          context.stroke();
         }
+        context.restore();
+        context.restore();
+      }
+
+      function drawDroplets() {
+        context.save();
+        for (const drop of droplets) {
+          context.beginPath();
+          context.ellipse(drop.x, drop.y, drop.r * 0.72, drop.r * 1.35, 0, 0, Math.PI * 2);
+          context.fillStyle = "rgba(91,141,217,.78)";
+          context.fill();
+          context.strokeStyle = "rgba(255,255,255,.72)";
+          context.lineWidth = 1;
+          context.stroke();
+        }
+        context.restore();
+      }
+
+      function drawBench() {
+        const benchY = height * 0.9;
+        const g = flaskGeometry();
+        const tileWidth = Math.min(190, width * 0.48);
+        const tileHeight = 12;
+        context.fillStyle = "rgba(255,255,255,.82)";
+        context.strokeStyle = "rgba(153,166,187,.5)";
+        context.lineWidth = 1;
+        context.beginPath();
+        context.roundRect(g.cx - tileWidth / 2, benchY - tileHeight, tileWidth, tileHeight, 3);
+        context.fill();
+        context.stroke();
+        context.fillStyle = "rgba(70,84,108,.12)";
+        context.fillRect(0, benchY + 2, width, height - benchY);
+        context.fillStyle = "rgba(255,255,255,.28)";
+        context.fillRect(0, benchY + 3, width, 2);
       }
 
       function drawReadouts(ph) {
@@ -331,11 +458,30 @@
         context.font = "700 13px system-ui, sans-serif";
         context.textAlign = "right";
         context.textBaseline = "top";
-        context.fillText(`Titrant added: ${addedVolume.toFixed(1)} mL`, width - 20, 16);
+        context.fillText(`Titrant added: ${addedVolume.toFixed(2)} mL`, width - 20, 16);
         context.fillText(`pH: ${ph.toFixed(2)}`, width - 20, 36);
         context.fillStyle = themeStyles.getPropertyValue("--subtle-text").trim();
         context.font = "600 11px system-ui, sans-serif";
         context.fillText(`Equivalence at ${equivalenceVolume.toFixed(1)} mL`, width - 20, 58);
+      }
+
+      function buretteTapBounds() {
+        const g = flaskGeometry();
+        const bottomY = g.neckTop - 6;
+        return { left: g.cx - 20, right: g.cx + 20, top: bottomY - 5, bottom: bottomY + 17 };
+      }
+
+      function isOverTap(x, y) {
+        const tap = buretteTapBounds();
+        return x >= tap.left && x <= tap.right && y >= tap.top && y <= tap.bottom;
+      }
+
+      function dispenseOneDrop() {
+        if (finished || addedVolume + pendingVolume() >= maxVolume - 1e-9) return;
+        running = false;
+        dripTimer = 0;
+        createDrop();
+        updateControls();
       }
 
       function draw() {
@@ -345,18 +491,17 @@
         context.fillStyle = themeStyles.getPropertyValue("--canvas-background").trim();
         context.fillRect(0, 0, width, height);
 
-        context.fillStyle = themeStyles.getPropertyValue("--divider").trim();
-        context.fillRect(0, height * 0.9, width, 2);
-
         const ph = solvePH(addedVolume);
+        drawBench();
         drawStand();
         drawBurette(ph);
+        drawDroplets();
         drawFlask(ph);
         drawReadouts(ph);
       }
 
       function updateStats(ph) {
-        statVolume.textContent = `${addedVolume.toFixed(1)} mL`;
+        statVolume.textContent = `${addedVolume.toFixed(2)} mL`;
         statPh.textContent = ph.toFixed(2);
         statEquiv.textContent = `${equivalenceVolume.toFixed(1)} mL`;
       }
@@ -365,8 +510,8 @@
         if (finished) {
           statusEl.textContent = "Titration complete — compare your endpoint volume with the calculated equivalence point.";
           statusEl.classList.remove("endpoint");
-        } else if (!running && addedVolume === 0) {
-          statusEl.textContent = "Ready — press Start titration";
+        } else if (!running && addedVolume === 0 && droplets.length === 0) {
+          statusEl.textContent = "Ready — add one drop or start the titration";
           statusEl.classList.remove("endpoint");
         } else if (running) {
           if (addedVolume >= equivalenceVolume * 0.97) {
@@ -377,7 +522,11 @@
             statusEl.classList.remove("endpoint");
           }
         } else {
-          statusEl.textContent = "Paused — press Resume to continue";
+          statusEl.textContent = droplets.length && addedVolume === 0
+            ? "Drop dispensed — watch it fall, add another, or start the titration"
+            : droplets.length
+              ? "Paused — a drop is still falling; add a drop or resume"
+              : "Paused — press Resume or add one drop";
           statusEl.classList.remove("endpoint");
         }
       }
@@ -472,8 +621,9 @@
         titrantMolarityOutput.textContent = `${titrantMolarity.toFixed(2)} M`;
         speedOutput.value = `${titrationSpeed.toFixed(1)} mL/s`;
         speedOutput.textContent = `${titrationSpeed.toFixed(1)} mL/s`;
-        titrateButton.textContent = running ? "Pause" : (finished ? "Titration complete" : (addedVolume > 0 ? "Resume" : "Start titration"));
+        titrateButton.textContent = running ? "Pause" : (finished ? "Titration complete" : (addedVolume > 0 || droplets.length > 0 ? "Resume" : "Start titration"));
         titrateButton.disabled = finished;
+        addDropButton.disabled = finished || addedVolume + pendingVolume() >= maxVolume - 1e-9;
         resetButton.disabled = false;
       }
 
@@ -481,7 +631,9 @@
         addedVolume = 0;
         running = false;
         finished = false;
-        bubbles = [];
+        droplets = [];
+        ripple = null;
+        flaskShake = null;
         buildCurve();
         updateControls();
         updateStatus(solvePH(0));
@@ -494,21 +646,15 @@
         const dt = Math.min(0.05, (timestamp - lastTime) / 1000);
         lastTime = timestamp;
 
-        if (running && !finished) {
-          addedVolume += titrationSpeed * dt;
-          if (addedVolume >= maxVolume) {
-            addedVolume = maxVolume;
-            running = false;
-            finished = true;
-          }
-          drawDrip(dt);
-        }
+        drawDrip(dt);
+        if (!running && droplets.length === 0 && addedVolume >= maxVolume) finished = true;
 
         const ph = solvePH(addedVolume);
         updateStats(ph);
         updateStatus(ph);
         updateControls();
         draw();
+        drawChart();
         requestAnimationFrame(frame);
       }
 
@@ -517,6 +663,9 @@
         addedVolume = 0;
         running = false;
         finished = false;
+        droplets = [];
+        ripple = null;
+        flaskShake = null;
         buildCurve();
         updateControls();
       });
@@ -545,11 +694,24 @@
       });
       titrateButton.addEventListener("click", () => {
         if (finished) return;
-        if (!running && addedVolume >= maxVolume) addedVolume = 0;
+        if (!running && addedVolume + pendingVolume() >= maxVolume - 1e-9) return;
         running = !running;
+        if (running) dripTimer = 0;
         updateControls();
       });
+      addDropButton.addEventListener("click", dispenseOneDrop);
       resetButton.addEventListener("click", reset);
+      canvas.addEventListener("click", (event) => {
+        const bounds = canvas.getBoundingClientRect();
+        const x = event.clientX - bounds.left;
+        const y = event.clientY - bounds.top;
+        if (isOverTap(x, y)) dispenseOneDrop();
+      });
+      canvas.addEventListener("pointermove", (event) => {
+        const bounds = canvas.getBoundingClientRect();
+        canvas.classList.toggle("over-tap", isOverTap(event.clientX - bounds.left, event.clientY - bounds.top));
+      });
+      canvas.addEventListener("pointerleave", () => canvas.classList.remove("over-tap"));
       themeToggleButton.addEventListener("click", () => {
         theme = theme === "dark" ? "light" : "dark";
         localStorage.setItem("titration-theme", theme);
