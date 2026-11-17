@@ -45,7 +45,9 @@
       let dripTimer = 0;
       let droplets = [];
       let ripple = null;
-      let flaskShake = null;
+      let flaskTilt = 0;
+      let draggingFlask = false;
+      let lastShakeX = 0;
       let lastTime = 0;
 
       const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -337,17 +339,12 @@
           if (drop.y >= surfaceY) {
             addedVolume = Math.min(maxVolume, addedVolume + drop.volume);
             ripple = { y: surfaceY, age: 0 };
-            flaskShake = { age: 0, direction: Math.random() < 0.5 ? -1 : 1 };
             droplets.splice(i, 1);
           }
         }
         if (ripple) {
           ripple.age += dt;
           if (ripple.age > 0.45) ripple = null;
-        }
-        if (flaskShake) {
-          flaskShake.age += dt;
-          if (flaskShake.age > 0.4) flaskShake = null;
         }
       }
 
@@ -366,13 +363,9 @@
         const glassBorder = themeStyles.getPropertyValue("--glass-border").trim();
         const fill = indicatorRGB(ph);
         const fraction = currentFraction();
-        const shakeAngle = flaskShake
-          ? flaskShake.direction * 0.026 * Math.exp(-9 * flaskShake.age) * Math.cos(flaskShake.age * Math.PI * 2 * 10)
-          : 0;
-
         context.save();
         context.translate(g.cx, g.bottomY);
-        context.rotate(shakeAngle);
+        context.rotate(flaskTilt);
         context.translate(-g.cx, -g.bottomY);
         clipFlaskLiquid(g, fill, fraction);
 
@@ -474,6 +467,16 @@
       function isOverTap(x, y) {
         const tap = buretteTapBounds();
         return x >= tap.left && x <= tap.right && y >= tap.top && y <= tap.bottom;
+      }
+
+      function isOverFlask(x, y) {
+        flaskPath(flaskGeometry());
+        return context.isPointInPath(x, y);
+      }
+
+      function canvasPoint(event) {
+        const bounds = canvas.getBoundingClientRect();
+        return { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
       }
 
       function dispenseOneDrop() {
@@ -633,7 +636,7 @@
         finished = false;
         droplets = [];
         ripple = null;
-        flaskShake = null;
+        flaskTilt = 0;
         buildCurve();
         updateControls();
         updateStatus(solvePH(0));
@@ -648,6 +651,10 @@
 
         drawDrip(dt);
         if (!running && droplets.length === 0 && addedVolume >= maxVolume) finished = true;
+        if (!draggingFlask) {
+          flaskTilt *= Math.exp(-5 * dt);
+          if (Math.abs(flaskTilt) < 0.001) flaskTilt = 0;
+        }
 
         const ph = solvePH(addedVolume);
         updateStats(ph);
@@ -665,7 +672,7 @@
         finished = false;
         droplets = [];
         ripple = null;
-        flaskShake = null;
+        flaskTilt = 0;
         buildCurve();
         updateControls();
       });
@@ -702,16 +709,38 @@
       addDropButton.addEventListener("click", dispenseOneDrop);
       resetButton.addEventListener("click", reset);
       canvas.addEventListener("click", (event) => {
-        const bounds = canvas.getBoundingClientRect();
-        const x = event.clientX - bounds.left;
-        const y = event.clientY - bounds.top;
-        if (isOverTap(x, y)) dispenseOneDrop();
+        const point = canvasPoint(event);
+        if (isOverTap(point.x, point.y)) dispenseOneDrop();
       });
       canvas.addEventListener("pointermove", (event) => {
-        const bounds = canvas.getBoundingClientRect();
-        canvas.classList.toggle("over-tap", isOverTap(event.clientX - bounds.left, event.clientY - bounds.top));
+        const point = canvasPoint(event);
+        if (draggingFlask) {
+          flaskTilt = clamp(flaskTilt + (point.x - lastShakeX) * 0.012, -0.3, 0.3);
+          lastShakeX = point.x;
+          canvas.classList.add("shaking-flask");
+          return;
+        }
+        canvas.classList.toggle("over-tap", isOverTap(point.x, point.y));
+        canvas.classList.toggle("over-flask", isOverFlask(point.x, point.y));
       });
-      canvas.addEventListener("pointerleave", () => canvas.classList.remove("over-tap"));
+      canvas.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0) return;
+        const point = canvasPoint(event);
+        if (!isOverFlask(point.x, point.y)) return;
+        draggingFlask = true;
+        lastShakeX = point.x;
+        canvas.setPointerCapture(event.pointerId);
+        canvas.classList.add("shaking-flask");
+      });
+      const releaseFlask = () => {
+        draggingFlask = false;
+        canvas.classList.remove("shaking-flask");
+      };
+      canvas.addEventListener("pointerup", releaseFlask);
+      canvas.addEventListener("pointercancel", releaseFlask);
+      canvas.addEventListener("pointerleave", () => {
+        if (!draggingFlask) canvas.classList.remove("over-tap", "over-flask");
+      });
       themeToggleButton.addEventListener("click", () => {
         theme = theme === "dark" ? "light" : "dark";
         localStorage.setItem("titration-theme", theme);

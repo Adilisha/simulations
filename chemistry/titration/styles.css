@@ -137,6 +137,8 @@
     }
     #simulation { cursor: default; }
     #simulation.over-tap { cursor: pointer; }
+    #simulation.over-flask { cursor: grab; }
+    #simulation.shaking-flask { cursor: grabbing; }
 
     #chart { height: 96px; min-height: 0; cursor: default; }
 

@@ -19,13 +19,14 @@ Keep all three application files in the same folder:
 - **Titrant concentration** — the standard solution in the burette.
 - **Indicator** — phenolphthalein, methyl orange, or bromothymol blue. The flask liquid changes color across the indicator's transition range.
 - **Add one drop** — dispense 0.05 mL manually, either with the button or by clicking the burette tap. The pH, liquid level, indicator color, and chart update as each drop lands.
+- **Swirl the flask** — click and drag the flask left and right to mix the solution. Release it to let it settle back upright.
 - **Titration speed** — how fast the automatic flow adds titrant.
 - **Start / Pause / Resume / Reset** — control the automatic flow or clear the experiment.
 
 ## What to observe
 
 - The pH readout and the flask color both respond to the added titrant volume.
-- The burette tap releases drops into the flask, where each impact creates ripples and a brief, gentle flask shake.
+- The burette tap releases drops into the flask, where each impact creates ripples. Shake the flask yourself by dragging it left and right.
 - The chart shows the full theoretical pH curve (faint) with your progress traced in blue as drops land; the dashed red line marks the calculated equivalence point.
 - The status line flags the endpoint region as you approach the equivalence point.
 - Weak acids show a buffered region and a less steep pH jump — try each indicator to see which transitions near the endpoint.
