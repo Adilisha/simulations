@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f3f6fb">
+  <title>Chemical Kinetics Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="header-top">
+        <div class="brand">
+          <img class="logo" src="../titration/logo.png" alt="Simulations logo">
+          <p class="eyebrow">Interactive chemistry</p>
+        </div>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">Use dark theme</button>
+      </div>
+      <h1>Chemical Kinetics Lab</h1>
+      <p class="intro">Investigate how concentration, temperature and a catalyst affect the rate of a reaction. Run the experiment, collect readings and compare the concentration-time graph.</p>
+    </header>
+
+    <section class="layout" aria-label="Chemical kinetics simulation">
+      <div class="stage">
+        <div class="stage-heading">
+          <strong>Reaction vessel</strong>
+          <span class="hint">A + B → C</span>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="simulation" aria-label="Animated reaction vessel containing particles A and B"></canvas>
+        </div>
+        <div class="legend" aria-label="Legend">
+          <span><i class="key a"></i>Reactant A</span>
+          <span><i class="key b"></i>Reactant B</span>
+          <span><i class="key c"></i>Product C</span>
+          <span><i class="key curve"></i>Measured reaction</span>
+        </div>
+      </div>
+
+      <aside class="panel" aria-label="Kinetics controls">
+        <h2>Experiment</h2>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="concentration-a">Concentration of A</label>
+            <output id="concentration-a-value">0.100 mol/L</output>
+          </div>
+          <input id="concentration-a" type="range" min="0.02" max="0.20" value="0.10" step="0.01">
+          <div class="range-ends"><span>0.02 M</span><span>0.20 M</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="concentration-b">Concentration of B</label>
+            <output id="concentration-b-value">0.100 mol/L</output>
+          </div>
+          <input id="concentration-b" type="range" min="0.02" max="0.20" value="0.10" step="0.01">
+          <div class="range-ends"><span>0.02 M</span><span>0.20 M</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <label for="temperature">Temperature</label>
+            <output id="temperature-value">298 K</output>
+          </div>
+          <input id="temperature" type="range" min="273" max="353" value="298" step="1">
+          <div class="range-ends"><span>273 K</span><span>353 K</span></div>
+        </div>
+
+        <div class="control">
+          <div class="control-heading">
+            <span>Catalyst</span>
+            <output id="catalyst-value">No</output>
+          </div>
+          <label class="switch">
+            <input id="catalyst" type="checkbox">
+            <span>Add catalyst</span>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="run" class="primary" type="button">Start reaction</button>
+          <button id="pause" type="button" disabled>Pause</button>
+          <button id="reset" type="button">Reset</button>
+        </div>
+
+        <div class="stats" aria-label="Experiment readings">
+          <div class="stat"><span>Elapsed</span><strong id="stat-time">0.0 s</strong></div>
+          <div class="stat"><span>[A]</span><strong id="stat-a">0.100 M</strong></div>
+          <div class="stat"><span>Rate</span><strong id="stat-rate">—</strong></div>
+        </div>
+
+        <div class="status" id="status" aria-live="polite">Ready — adjust the conditions and start the reaction</div>
+
+        <div class="chart-wrap">
+          <canvas id="chart" aria-label="Concentration-time graph"></canvas>
+          <div class="chart-legend">
+            <span><i class="key line-a"></i>[A]</span>
+            <span><i class="key line-b"></i>[B]</span>
+          </div>
+        </div>
+
+        <div class="tip"><strong>Method:</strong> Keep every condition constant except one. Compare initial rates, not just the time taken for the same reaction to finish.</div>
+      </aside>
+    </section>
+  </main>
+  <script src="script.js" defer></script>
+</body>
+</html>
