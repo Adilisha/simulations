@@ -12,6 +12,7 @@ Open `index.html` directly in a modern browser, or serve this folder with a stat
 - Change the temperature from 273 to 353 K.
 - Add a catalyst.
 - Start, pause or reset the virtual reaction.
+- Save multiple trials and compare their concentrations, temperature, catalyst status and initial rates.
 
 The vessel shows A particles in blue, B particles in amber and product C particles in purple. The graph records [A] and [B] against virtual time.
 

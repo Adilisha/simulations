@@ -91,6 +91,8 @@
           <div class="stat"><span>Rate</span><strong id="stat-rate">—</strong></div>
         </div>
 
+        <div class="stat initial-rate"><span>Initial rate</span><strong id="stat-initial-rate">—</strong></div>
+
         <div class="status" id="status" aria-live="polite">Ready — adjust the conditions and start the reaction</div>
 
         <div class="chart-wrap">
@@ -101,7 +103,32 @@
           </div>
         </div>
 
-        <div class="tip"><strong>Method:</strong> Keep every condition constant except one. Compare initial rates, not just the time taken for the same reaction to finish.</div>
+        <div class="trials">
+          <div class="trials-heading">
+            <strong>Recorded trials</strong>
+            <button id="save-trial" type="button" disabled>Save trial</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Trial</th>
+                  <th>[A]</th>
+                  <th>[B]</th>
+                  <th>Temp.</th>
+                  <th>Catalyst</th>
+                  <th>Initial rate</th>
+                </tr>
+              </thead>
+              <tbody id="trials-body">
+                <tr class="empty-row"><td colspan="6">No trials saved</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <button id="clear-trials" class="clear-trials" type="button" disabled>Clear trials</button>
+        </div>
+
+        <div class="tip"><strong>Method:</strong> Keep every condition constant except one. Save each run and compare initial rates, not just the time taken for the reaction to finish.</div>
       </aside>
     </section>
   </main>

@@ -20,7 +20,11 @@
   const statTime = document.querySelector("#stat-time");
   const statA = document.querySelector("#stat-a");
   const statRate = document.querySelector("#stat-rate");
+  const statInitialRate = document.querySelector("#stat-initial-rate");
   const status = document.querySelector("#status");
+  const saveTrialButton = document.querySelector("#save-trial");
+  const clearTrialsButton = document.querySelector("#clear-trials");
+  const trialsBody = document.querySelector("#trials-body");
 
   let theme = localStorage.getItem("kinetics-theme") === "dark" ? "dark" : "light";
   let initialA = 0.10;
@@ -40,6 +44,8 @@
   let height = 0;
   let chartWidth = 0;
   let chartHeight = 0;
+  let trials = [];
+  let trialConditions = null;
 
   function rateConstant() {
     const base = 0.018;
@@ -105,6 +111,9 @@
     statTime.textContent = "0.0 s";
     statA.textContent = `${a.toFixed(3)} M`;
     statRate.textContent = "—";
+    statInitialRate.textContent = "—";
+    trialConditions = null;
+    saveTrialButton.disabled = true;
     if (recordStatus) status.textContent = "Ready — adjust the conditions and start the reaction";
     draw();
     drawChart();
@@ -115,6 +124,52 @@
     concentrationBOutput.textContent = `${Number(concentrationBInput.value).toFixed(3)} mol/L`;
     temperatureOutput.textContent = `${temperatureInput.value} K`;
     catalystOutput.textContent = catalystInput.checked ? "Yes" : "No";
+  }
+
+  function initialRate() {
+    return rateConstant() * initialA * initialB;
+  }
+
+  function renderTrials() {
+    trialsBody.replaceChildren();
+    if (trials.length === 0) {
+      const row = document.createElement("tr");
+      row.className = "empty-row";
+      const cell = document.createElement("td");
+      cell.colSpan = 6;
+      cell.textContent = "No trials saved";
+      row.appendChild(cell);
+      trialsBody.appendChild(row);
+      clearTrialsButton.disabled = true;
+      return;
+    }
+
+    trials.forEach((trial, index) => {
+      const row = document.createElement("tr");
+      const values = [
+        index + 1,
+        `${trial.initialA.toFixed(3)} M`,
+        `${trial.initialB.toFixed(3)} M`,
+        `${trial.temperature} K`,
+        trial.catalyst ? "Yes" : "No",
+        `${trial.initialRate.toFixed(5)} M/s`
+      ];
+      values.forEach((value) => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+      trialsBody.appendChild(row);
+    });
+    clearTrialsButton.disabled = false;
+  }
+
+  function saveCurrentTrial() {
+    if (!trialConditions) return;
+    trials.push({ ...trialConditions });
+    renderTrials();
+    saveTrialButton.disabled = true;
+    status.textContent = `Trial ${trials.length} saved — change one condition to compare a new run`;
   }
 
   function applyTheme() {
@@ -274,11 +329,10 @@
 
     const k = rateConstant();
     const rate = k * a * b;
-    const consumed = rate * virtualDelta;
-    const beforeA = a;
+    const consumed = Math.min(a, b, rate * virtualDelta);
     a = Math.max(0, a - consumed);
     b = Math.max(0, b - consumed);
-    product += beforeA - a;
+    product += consumed;
     elapsed += virtualDelta;
 
     if (elapsed % 0.25 < virtualDelta || elapsed >= 60) {
@@ -311,9 +365,18 @@
     if (finished) resetExperiment(false);
     running = true;
     lastTimestamp = 0;
+    trialConditions = {
+      initialA,
+      initialB,
+      temperature,
+      catalyst,
+      initialRate: initialRate()
+    };
     runButton.textContent = "Reaction running";
     runButton.disabled = true;
     pauseButton.disabled = false;
+    saveTrialButton.disabled = false;
+    statInitialRate.textContent = `${trialConditions.initialRate.toFixed(5)} M/s`;
     status.textContent = "Running — particles collide and the concentrations decrease";
     syncParticles();
     requestAnimationFrame(step);
@@ -338,6 +401,12 @@
   });
 
   resetButton.addEventListener("click", () => resetExperiment());
+  saveTrialButton.addEventListener("click", saveCurrentTrial);
+  clearTrialsButton.addEventListener("click", () => {
+    trials = [];
+    renderTrials();
+    status.textContent = "Trial list cleared — run a new experiment";
+  });
   themeButton.addEventListener("click", () => {
     theme = theme === "dark" ? "light" : "dark";
     localStorage.setItem("kinetics-theme", theme);
@@ -346,6 +415,7 @@
 
   window.addEventListener("resize", resize);
   updateControls();
+  renderTrials();
   resetExperiment();
   applyTheme();
   resize();
