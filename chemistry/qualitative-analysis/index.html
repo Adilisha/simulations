@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Qualitative Analysis - Cations</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="header-top">
+        <div class="brand">
+          <img class="logo" src="../../logo-light.png" alt="Simulations logo">
+          <p class="eyebrow">Interactive chemistry</p>
+        </div>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">Use dark theme</button>
+      </div>
+      <h1>Tests for Common Cations</h1>
+      <p class="intro">Choose a known sample to learn its reactions, or test a mystery sample and identify its cation from the evidence.</p>
+    </header>
+
+    <section class="layout" aria-label="Qualitative cation analysis simulation">
+      <div class="stage">
+        <div class="stage-heading">
+          <strong>Test bench</strong>
+          <span id="test-count">0 observations</span>
+        </div>
+
+        <div class="test-area">
+          <div class="sample-controls">
+            <label class="sample-label" for="sample">Sample to test</label>
+            <select id="sample">
+              <option value="mystery" selected>Mystery unknown</option>
+              <option value="Ag+">Silver (Ag+)</option>
+              <option value="Pb2+">Lead (Pb2+)</option>
+              <option value="Cu2+">Copper (Cu2+)</option>
+              <option value="Fe2+">Iron(II) (Fe2+)</option>
+              <option value="Fe3+">Iron(III) (Fe3+)</option>
+              <option value="Al3+">Aluminium (Al3+)</option>
+              <option value="Zn2+">Zinc (Zn2+)</option>
+              <option value="Ca2+">Calcium (Ca2+)</option>
+              <option value="Ba2+">Barium (Ba2+)</option>
+              <option value="NH4+">Ammonium (NH4+)</option>
+            </select>
+          </div>
+
+          <div class="test-tube-wrap" aria-live="polite">
+            <div class="test-tube">
+              <div id="solution" class="solution"></div>
+              <div id="precipitate" class="precipitate"></div>
+            </div>
+            <div id="flame" class="flame" aria-hidden="true"></div>
+            <p id="tube-label">Clear, colourless solution</p>
+          </div>
+
+          <div class="observation-box">
+            <h2>Latest observation</h2>
+            <p id="observation">Choose a reagent to begin.</p>
+          </div>
+        </div>
+
+        <div class="reagent-section">
+          <h2>Reagents</h2>
+          <div id="reagents" class="reagent-grid"></div>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <h2>Identification</h2>
+        <p class="panel-intro">Record observations, then select a cation as your answer.</p>
+
+        <div id="identity-grid" class="identity-grid"></div>
+        <button id="check-answer" class="primary" type="button" disabled>Check answer</button>
+        <button id="reset" class="secondary" type="button">New sample / reset</button>
+
+        <div id="result" class="result" aria-live="polite"></div>
+
+        <details class="notes">
+          <summary>Common test notes</summary>
+          <ul>
+            <li>Precipitate = an insoluble solid in the test tube.</li>
+            <li>Excess NaOH or NH<sub>3</sub> can reveal soluble complex formation.</li>
+            <li>Flame observations are characteristic but can be affected by contamination.</li>
+          </ul>
+        </details>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
