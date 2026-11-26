@@ -136,7 +136,7 @@
       const row = document.createElement("tr");
       row.className = "empty-row";
       const cell = document.createElement("td");
-      cell.colSpan = 6;
+      cell.colSpan = 7;
       cell.textContent = "No trials saved";
       row.appendChild(cell);
       trialsBody.appendChild(row);
@@ -152,7 +152,8 @@
         `${trial.initialB.toFixed(3)} M`,
         `${trial.temperature} K`,
         trial.catalyst ? "Yes" : "No",
-        `${trial.initialRate.toFixed(5)} M/s`
+        `${trial.initialRate.toFixed(5)} M/s`,
+        `${trial.elapsed.toFixed(1)} s`
       ];
       values.forEach((value) => {
         const cell = document.createElement("td");
@@ -166,7 +167,7 @@
 
   function saveCurrentTrial() {
     if (!trialConditions) return;
-    trials.push({ ...trialConditions });
+    trials.push({ ...trialConditions, elapsed });
     renderTrials();
     saveTrialButton.disabled = true;
     status.textContent = `Trial ${trials.length} saved — change one condition to compare a new run`;
