@@ -7,3 +7,4 @@ Explore interactive simulations that help make chemical ideas easier to understa
 - [Titration Lab](titration/)
 - [3D Titration Lab](titration-3d/)
 - [Chemical Kinetics Lab](chemical-kinetics/)
+- [Tests for Common Cations](qualitative-analysis/)
