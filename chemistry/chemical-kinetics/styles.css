@@ -83,7 +83,7 @@ canvas { display: block; width: 100%; height: 100%; min-height: 430px; }
 .key.c { background: #9a67d5; }
 .key.curve { width: 14px; height: 3px; border-radius: 2px; background: #5478e8; }
 .key.line-a { width: 14px; height: 3px; border-radius: 2px; background: #5478e8; }
-.key.line-b { width: 14px; height: 3px; border-radius: 2px; background: #e09a43; }
+.key.line-b { width: 14px; height: 3px; border-radius: 2px; background: repeating-linear-gradient(to right, #e09a43 0 4px, transparent 4px 7px); }
 .panel { padding: 20px; }
 .panel h2 { margin: 0 0 18px; font-size: 1rem; }
 .control { margin: 0 0 17px; }

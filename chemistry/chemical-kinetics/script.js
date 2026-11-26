@@ -308,6 +308,7 @@
       chartCtx.beginPath();
       chartCtx.strokeStyle = color;
       chartCtx.lineWidth = 2;
+      chartCtx.setLineDash(key === "b" ? [4, 3] : []);
       samples.forEach((point, i) => {
         const x = pad.left + point.time / maxTime * plotW;
         const y = pad.top + plotH * (1 - point[key] / maxConc);
@@ -315,6 +316,7 @@
         else chartCtx.lineTo(x, y);
       });
       chartCtx.stroke();
+      chartCtx.setLineDash([]);
     }
     plotSeries("a", "#5478e8");
     plotSeries("b", "#e09a43");
