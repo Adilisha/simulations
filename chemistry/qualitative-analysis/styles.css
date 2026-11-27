@@ -114,6 +114,7 @@ select { width: 100%; min-height: 42px; border: 1px solid var(--button-border); 
 .notes { margin-top: 14px; color: var(--muted); font-size: .76rem; line-height: 1.45; }
 .notes summary { cursor: pointer; color: var(--text); }
 .notes ul { padding-left: 18px; }
+.safety-note { color: var(--danger); font-weight: 650; }
 
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
