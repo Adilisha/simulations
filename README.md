@@ -1,12 +1,21 @@
 # Interactive Simulations
 
-This repository is a collection of standalone interactive simulations. Each project is organized in its own folder and may include the files and instructions needed to use it.
+This repository is a growing collection of standalone interactive simulations for exploring science and mathematics. The projects are designed to be simple, visual and easy to use in a browser.
+
+## Available subjects
+
+- [Physics](physics/)
+- [Chemistry](chemistry/)
+- [Biology](biology/)
+- [Earth science](earth-science/)
+- [Engineering](engineering/)
+- [Mathematics](mathematics/)
 
 ## Getting started
 
-1. Browse the folders and choose a project.
-2. Open that project's `index.html` file in a modern web browser.
-3. If the project has its own README, check it for specific instructions and available controls.
+1. Choose a subject and open one of its simulation folders.
+2. Open the `index.html` file in a modern web browser.
+3. Adjust the controls, run the model and observe how the results change.
 
-The projects are intended to run independently; there is no single application to install or launch for the entire repository. Unless a project's instructions say otherwise, no installation or build step is needed.
+Each simulation is intended to run independently. No installation or build step is required unless a project's README says otherwise.
 at readme speak in general 
