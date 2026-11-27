@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#eef4ff">
+  <title>Convex Lens Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="header-top">
+        <div class="brand"><p class="eyebrow">Interactive physics</p></div>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">Use dark theme</button>
+      </div>
+      <h1>Convex Lens Lab</h1>
+      <p class="intro">Move an object and change the focal length to explore how a converging lens forms real and virtual images. Follow the animated principal rays.</p>
+    </header>
+
+    <section class="layout" aria-label="Convex lens simulation">
+      <div class="stage">
+        <div class="stage-heading"><strong>Principal ray diagram</strong><span class="hint">Animated rays pass through the lens</span></div>
+        <div class="canvas-wrap"><canvas id="simulation" aria-label="Animated ray diagram showing an object, convex lens, focal points, and image"></canvas></div>
+        <div class="legend" aria-label="Ray diagram legend">
+          <span><i class="key object"></i>Object</span><span><i class="key lens"></i>Convex lens</span><span><i class="key ray"></i>Parallel ray</span><span><i class="key ray-two"></i>Central ray</span><span><i class="key ray-three"></i>Focal ray</span><span><i class="key virtual"></i>Virtual extension</span>
+        </div>
+      </div>
+
+      <aside class="panel" aria-label="Lens controls and readings">
+        <h2>Experiment</h2>
+        <p class="panel-intro">The object and lens sit along the principal axis. Dashed rays trace backward to locate a virtual image.</p>
+        <div class="control">
+          <div class="control-heading"><label for="object-distance">Object distance (u)</label><output id="object-distance-value" for="object-distance">30 cm</output></div>
+          <input id="object-distance" type="range" min="8" max="50" step="1" value="30">
+          <div class="range-ends"><span>8 cm</span><span>50 cm</span></div>
+        </div>
+        <div class="control">
+          <div class="control-heading"><label for="focal-length">Focal length (f)</label><output id="focal-length-value" for="focal-length">12 cm</output></div>
+          <input id="focal-length" type="range" min="5" max="25" step="1" value="12">
+          <div class="range-ends"><span>5 cm</span><span>25 cm</span></div>
+        </div>
+        <div class="control">
+          <div class="control-heading"><label for="object-height">Object height</label><output id="object-height-value" for="object-height">4 cm</output></div>
+          <input id="object-height" type="range" min="1" max="8" step="1" value="4">
+          <div class="range-ends"><span>1 cm</span><span>8 cm</span></div>
+        </div>
+        <div class="stats" aria-live="polite">
+          <div class="stat"><span>Image distance (v)</span><strong id="image-distance-readout">20.0 cm</strong></div>
+          <div class="stat"><span>Magnification (m)</span><strong id="magnification-readout">−0.67×</strong></div>
+          <div class="stat"><span>Image height</span><strong id="image-height-readout">−2.67 cm</strong></div>
+          <div class="stat"><span>Image type</span><strong id="image-type-readout">Real, inverted</strong></div>
+        </div>
+        <div class="button-row">
+          <button id="toggle" class="primary" type="button">Pause</button>
+          <button id="reset" type="button">Reset</button>
+        </div>
+        <div class="tip"><strong>Thin lens equation:</strong> <b>1/f = 1/u + 1/v</b>. Magnification is <b>m = −v/u</b>. If the object is inside the focal length, the image is virtual, upright, and on the same side as the object.</div>
+      </aside>
+    </section>
+  </main>
+  <script src="script.js" defer></script>
+</body>
+</html>
